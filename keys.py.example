@@ -1,0 +1,9 @@
+DD_API_KEY = <INSERT-API-KEY>
+DD_API_KEY_EU = <INSERT-API-KEY>
+DD_API_KEY_STAGING = <INSERT-API-KEY>
+DD_API_KEY_AZURE = <INSERT-API-KEY>
+
+HTTP_ENDPOINT = 'http-intake.logs.datadoghq.com'
+EU_ENDPOINT = 'http-intake.logs.datadoghq.eu'
+STAGING_ENDPOINT = <INSERT-STAGING-ENDPOINT>
+AZURE_ENDPOINT = 'http-intake.logs.us3.datadoghq.com'
