@@ -1,7 +1,9 @@
 '''
-Hypothetical command-line tool for searching a
-collection of files for one or more text patterns.
+Command-line tool for sending logs
+to Datadog with arguments for different environments
+and reserved attribute settings.
 '''
+
 import os
 import argparse
 import requests
@@ -40,55 +42,66 @@ def main():
 
 def send_logs():
 
-    URL = construct_url()
+    env = get_env()
+    parameters = get_parameters()
+
+    URL = 'https://'+env['endpoint']+'/api/v2/logs/'+parameters
+
+    headers = {'DD-API-KEY': env['api_key']}
 
     if os.path.exists(args.string):
         data = open(args.string)
-        headers = {'Content-Type': 'text/plain'}
+        headers.update({'Content-Type': 'text/plain'})
     else:
         data = args.string
-        headers = {'Content-Type': 'application/json'}
+        headers.update({'Content-Type': 'application/json'})
 
     response = requests.post(URL, data, headers=headers)
     print(response.status_code)
 
 
-def construct_url():
+def get_env():
+
+    env = {}
 
     if args.environment == 'eu':
-        endpoint = keys.EU_ENDPOINT
-        api_key = keys.DD_API_KEY_EU
+        env.update({
+            'endpoint': keys.EU_ENDPOINT,
+            'api_key': keys.DD_API_KEY_EU
+        })
     elif args.environment == 'staging':
-        endpoint = keys.STAGING_ENDPOINT
-        api_key = keys.DD_API_KEY_STAGING
+        env.update({
+            'endpoint': keys.STAGING_ENDPOINT,
+            'api_key': keys.DD_API_KEY_STAGING
+        })
     elif args.environment == 'azure':
-        endpoint = keys.AZURE_ENDPOINT
-        api_key = keys.DD_API_KEY_AZURE
+        env.update({
+            'endpoint': keys.AZURE_ENDPOINT,
+            'api_key': keys.DD_API_KEY_AZURE
+        })
     else:
-        endpoint = keys.HTTP_ENDPOINT
-        api_key = keys.DD_API_KEY
+        env.update({
+            'endpoint': keys.HTTP_ENDPOINT,
+            'api_key': keys.DD_API_KEY
+        })
 
-    parameters = get_parameters(api_key)
-
-    URL = 'https://'+endpoint+'/v1/input/'+parameters
-    return URL
+    return env
 
 
-def get_parameters(key):
-    logparams = key
+def get_parameters():
 
     if not args.nodefaults:
-        logparams = logparams+'?ddsource='+args.source+'&service='+args.service
+        parameters = '?ddsource='+args.source+'&service='+args.service
     else:
-        logparams = logparams+'?'
+        parameters = '?'
 
     if args.host:
-        logparams = logparams+'&host='+args.host
+        parameters = parameters+'&host='+args.host
 
     if args.tags:
-        logparams = logparams+'&ddtags='+args.tags
+        parameters = parameters+'&ddtags='+args.tags
 
-    return logparams
+    return parameters
 
 
 if __name__ == "__main__":
