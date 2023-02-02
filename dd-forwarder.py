@@ -56,6 +56,7 @@ def send_logs():
         data = args.string
         headers.update({'Content-Type': 'application/json'})
 
+    data = data.encode('utf-8')
     response = requests.post(URL, data, headers=headers)
     print(response.status_code)
 
